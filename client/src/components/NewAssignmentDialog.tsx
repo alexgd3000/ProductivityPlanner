@@ -39,7 +39,7 @@ const assignmentFormSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   course: z.string().min(1, "Course is required"),
   description: z.string().optional(),
-  dueDate: z.coerce.date(),
+  dueDate: z.string().transform((val) => new Date(val)),
   priority: z.enum(["high", "medium", "low"]),
   estimatedTime: z.coerce.number().default(0),
   timeAvailable: z.coerce.number().default(120), // Default 2 hours in minutes
@@ -59,7 +59,7 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
       title: "",
       course: "",
       description: "",
-      dueDate: format(new Date(), "yyyy-MM-dd"),
+      dueDate: new Date().toISOString().split('T')[0],
       priority: "medium",
       estimatedTime: 0,
     },
