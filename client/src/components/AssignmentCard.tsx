@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Pencil, CheckCircle, UndoIcon } from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, isToday, isTomorrow } from "date-fns";
+import { parseISO } from 'date-fns';
 import TaskItem from "@/components/TaskItem";
 import AddTaskForm from "@/components/AddTaskForm";
 import EditAssignmentDialog from "@/components/EditAssignmentDialog";
@@ -36,7 +37,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
   const { toast } = useToast();
-  
+
   const { data: tasks = [], refetch: refetchTasks } = useQuery<Task[]>({
     queryKey: [`/api/assignments/${assignment.id}/tasks`],
   });
@@ -66,7 +67,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
       });
     },
   });
-  
+
   // Toggle assignment completion status
   const toggleAssignmentCompletionMutation = useMutation({
     mutationFn: async (completed: boolean) => {
@@ -82,16 +83,16 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
       queryClient.invalidateQueries({ queryKey: ['/api/assignments/completed'] });
       queryClient.invalidateQueries({ queryKey: [`/api/assignments/${assignment.id}/tasks`] });
       queryClient.invalidateQueries({ queryKey: ['/api/schedule'] });
-      
+
       const statusText = assignment.completed ? 'Current' : 'Completed';
       toast({
         title: `Assignment Moved to ${statusText}`,
         description: `"${assignment.title}" has been moved to ${statusText} Assignments`,
       });
-      
+
       // Close the confirmation dialog
       setShowCompleteDialog(false);
-      
+
       // Refresh the component
       onRefresh();
     },
@@ -109,19 +110,19 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
   const completedTasks = tasks.filter(task => task.completed).length;
   const totalTasks = tasks.length;
   const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  
+
   // Calculate time usage
   const totalTimeSpent = tasks.reduce((sum, task) => sum + task.timeSpent, 0);
   const totalTimeAllocation = tasks.reduce((sum, task) => sum + task.timeAllocation, 0);
   assignment.estimatedTime = totalTimeAllocation;
-  
+
   // Format time for display (convert minutes to hours and minutes)
   const formatTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
-  
+
   // Get priority badge style
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
@@ -146,7 +147,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
         new Date(item.startTime) <= new Date() && 
         new Date(item.endTime) >= new Date()
       );
-      
+
       if (activeScheduleItem && activeScheduleItem.task) {
         setActiveTaskId(activeScheduleItem.task.id);
       } else {
@@ -158,33 +159,33 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
       setActiveTaskId(null);
     }
   }, [isActive, scheduleData, assignment.id]);
-  
+
   const handleTaskUpdate = (taskId: number, isCompleted: boolean) => {
     updateTaskMutation.mutate({
       id: taskId,
       data: { completed: isCompleted }
     });
   };
-  
+
   // Move task up in order
   const moveTaskUp = (task: Task) => {
     const taskIndex = tasks.findIndex(t => t.id === task.id);
     if (taskIndex <= 0) return; // Already at the top
-    
+
     // Get the tasks we need to swap
     const taskToMoveUp = tasks[taskIndex];
     const taskToMoveDown = tasks[taskIndex - 1];
-    
+
     console.log("Task details - taskToMoveUp:", taskToMoveUp);
     console.log("Task details - taskToMoveDown:", taskToMoveDown);
-    
+
     // Update local state immediately for better UX
     const newTasks = [...tasks];
     // Swap the tasks
     const temp = newTasks[taskIndex];
     newTasks[taskIndex] = newTasks[taskIndex - 1];
     newTasks[taskIndex - 1] = temp;
-    
+
     // Use individual task update to send updates to server
     updateTaskMutation.mutate({
       id: taskToMoveUp.id,
@@ -197,7 +198,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
         timeSpent: taskToMoveUp.timeSpent || 0
       }
     });
-    
+
     updateTaskMutation.mutate({
       id: taskToMoveDown.id,
       data: {
@@ -210,26 +211,26 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
       }
     });
   };
-  
+
   // Move task down in order
   const moveTaskDown = (task: Task) => {
     const taskIndex = tasks.findIndex(t => t.id === task.id);
     if (taskIndex >= tasks.length - 1) return; // Already at the bottom
-    
+
     // Get the tasks we need to swap
     const taskToMoveDown = tasks[taskIndex];
     const taskToMoveUp = tasks[taskIndex + 1];
-    
+
     console.log("Task details - taskToMoveDown:", taskToMoveDown);
     console.log("Task details - taskToMoveUp:", taskToMoveUp);
-    
+
     // Update local state immediately for better UX
     const newTasks = [...tasks];
     // Swap the tasks
     const temp = newTasks[taskIndex];
     newTasks[taskIndex] = newTasks[taskIndex + 1];
     newTasks[taskIndex + 1] = temp;
-    
+
     // Use individual task update to send updates to server
     updateTaskMutation.mutate({
       id: taskToMoveDown.id,
@@ -242,7 +243,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
         timeSpent: taskToMoveDown.timeSpent || 0
       }
     });
-    
+
     updateTaskMutation.mutate({
       id: taskToMoveUp.id,
       data: {
@@ -255,7 +256,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
       }
     });
   };
-  
+
   const handleTaskCreated = () => {
     refetchTasks();
     onRefresh();
@@ -264,31 +265,15 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
   // Format due date
   let formattedDueDate;
   try {
-    // Make sure we have a valid date object
-    const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null;
-    
-    // Check if we have a valid date
-    if (!dueDate || isNaN(dueDate.getTime())) {
-      formattedDueDate = "no due date";
+    const dueDate = typeof assignment.dueDate === 'string' ? parseISO(assignment.dueDate) : new Date(assignment.dueDate);
+
+    // Format based on when it's due
+    if (isToday(dueDate)) {
+      formattedDueDate = "Due today";
+    } else if (isTomorrow(dueDate)) {
+      formattedDueDate = "Due tomorrow";
     } else {
-      const now = new Date();
-      
-      // Set both dates to start of day for comparison
-      const dueDateStart = new Date(dueDate.setHours(0, 0, 0, 0));
-      const todayStart = new Date(now.setHours(0, 0, 0, 0));
-      const tomorrowStart = new Date(todayStart);
-      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-      
-      if (dueDateStart < todayStart) {
-        formattedDueDate = "overdue";
-      } else if (dueDateStart.getTime() === todayStart.getTime()) {
-        formattedDueDate = "due today";
-      } else if (dueDateStart.getTime() === tomorrowStart.getTime()) {
-        formattedDueDate = "due tomorrow";
-      } else {
-        const diffDays = Math.ceil((dueDateStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
-        formattedDueDate = `due in ${diffDays} days`;
-      }
+      formattedDueDate = `Due ${format(dueDate, 'MMM d')}`;
     }
   } catch (error) {
     console.error("Error formatting due date:", error);
@@ -321,19 +306,19 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
                   {getPriorityBadge(assignment.priority)}
                 </div>
               </div>
-              
+
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center text-sm text-gray-500">
                   <i className="ri-calendar-line mr-1"></i>
                   <span>Due {formattedDueDate}</span>
                 </div>
-                
+
                 <div className="flex items-center text-sm text-gray-500">
                   <i className="ri-time-line mr-1"></i>
                   <span>Est: {formatTime(assignment.estimatedTime)}</span>
                 </div>
               </div>
-              
+
               <div className="mt-4">
                 <div className="flex items-center">
                   <Progress value={progress} className="h-2" />
@@ -344,7 +329,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
                 </div>
               </div>
             </div>
-            
+
             <div className="p-4 md:w-2/3">
               <h3 className="text-sm font-medium text-gray-900 mb-3">Task Breakdown</h3>
               <div className="space-y-2">
@@ -361,13 +346,13 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
                     isLast={index === tasks.length - 1}
                   />
                 ))}
-                
+
                 <AddTaskForm assignmentId={assignment.id} onTaskCreated={handleTaskCreated} />
               </div>
             </div>
           </div>
         </Card>
-        
+
         {/* Edit Assignment Dialog */}
         <EditAssignmentDialog 
           open={showEditDialog}
@@ -378,7 +363,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
       </>
     );
   }
-  
+
   return (
     <>
       <Card className={`overflow-hidden flex flex-col ${isActive ? 'border-2 border-primary-300' : ''}`}>
@@ -409,20 +394,20 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
             {getPriorityBadge(assignment.priority)}
           </div>
         </div>
-        
+
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center text-sm text-gray-500">
             <i className="ri-calendar-line mr-1"></i>
             <span>{formattedDueDate}</span>
           </div>
-          
+
           <div className="flex items-center text-sm text-gray-500">
             <i className="ri-time-line mr-1"></i>
             <span>Est: {formatTime(assignment.estimatedTime)}</span>
           </div>
         </div>
       </CardHeader>
-      
+
       {/* Edit Assignment Dialog */}
       <EditAssignmentDialog 
         open={showEditDialog}
@@ -430,7 +415,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
         assignment={assignment}
         onAssignmentUpdated={onRefresh}
       />
-      
+
       {/* Active assignment indicator */}
       {isActive && (
         <div className="px-6 py-2 border-b border-gray-200 bg-primary-50">
@@ -440,11 +425,11 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
           </p>
         </div>
       )}
-      
+
       {/* Card Content - Task Breakdown */}
       <CardContent className="px-6 py-4 flex-1 overflow-y-auto">
         <h3 className="text-sm font-medium text-gray-900 mb-3">Task Breakdown</h3>
-        
+
         <div className="space-y-3">
           {tasks.map((task, index) => (
             <TaskItem
@@ -460,10 +445,10 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
             />
           ))}
         </div>
-        
+
         <AddTaskForm assignmentId={assignment.id} onTaskCreated={handleTaskCreated} />
       </CardContent>
-      
+
       {/* Card Footer */}
       <CardFooter className="px-6 py-4 bg-gray-50 border-t border-gray-200">
         <div className="flex flex-col w-full gap-3">
@@ -492,7 +477,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
               </div>
             </div>
           </div>
-          
+
           {assignment.completed ? (
             <Button 
               variant="outline"
@@ -515,7 +500,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
         </div>
       </CardFooter>
     </Card>
-    
+
     {/* Confirmation Dialog for completing/moving assignment */}
     <AlertDialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
       <AlertDialogContent>
