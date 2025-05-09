@@ -44,49 +44,45 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <div className="flex-shrink-0">
                 <span className="text-xl font-semibold" style={{ color: '#6d856b' }}>Smart Schedule</span>
               </div>
-
-              {/* Mobile menu button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              >
-                <i className="ri-menu-line text-xl"></i>
-              </Button>
             </div>
 
-            {/* Menu toggled by hamburger button */}
-            <nav className={`fixed top-16 left-0 right-0 bg-white border-b border-gray-200 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-              <div className="px-4 py-2 space-y-2">
-                <Link href="/profile">
-                  <a className={getNavItemClass("/profile")}>
-                    <UserCircle className="mr-2 h-5 w-5" />
-                    Profile
-                  </a>
-                </Link>
+            {/* Top navigation tabs */}
+            <nav className="flex items-center space-x-4 px-4">
+              <Link href="/profile">
+                <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  location === "/profile" ? "bg-primary-50 text-primary-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`}>
+                  <UserCircle className="mr-2 h-5 w-5" />
+                  Profile
+                </a>
+              </Link>
 
-                <Link href="/upload">
-                  <a className={getNavItemClass("/upload")}>
-                    <Upload className="mr-2 h-5 w-5" />
-                    Upload
-                  </a>
-                </Link>
+              <Link href="/upload">
+                <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  location === "/upload" ? "bg-primary-50 text-primary-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`}>
+                  <Upload className="mr-2 h-5 w-5" />
+                  Upload
+                </a>
+              </Link>
 
-                <Link href="/planner">
-                  <a className={getNavItemClass("/planner")}>
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Planner
-                  </a>
-                </Link>
+              <Link href="/planner">
+                <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  location === "/planner" ? "bg-primary-50 text-primary-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`}>
+                  <Calendar className="mr-2 h-5 w-5" />
+                  Planner
+                </a>
+              </Link>
 
-                <Link href="/focus">
-                  <a className={getNavItemClass("/focus")}>
-                    <Clock className="mr-2 h-5 w-5" />
-                    Focus
-                  </a>
-                </Link>
-              </div>
+              <Link href="/focus">
+                <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  location === "/focus" ? "bg-primary-50 text-primary-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`}>
+                  <Clock className="mr-2 h-5 w-5" />
+                  Focus
+                </a>
+              </Link>
             </nav>
 
             {/* Right-side actions */}
