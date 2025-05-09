@@ -92,7 +92,12 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
   });
   
   const onSubmit = (data: AssignmentFormValues) => {
-    createAssignmentMutation.mutate(data);
+    // Ensure dueDate is properly formatted as an ISO string
+    const formattedData = {
+      ...data,
+      dueDate: new Date(data.dueDate).toISOString(),
+    };
+    createAssignmentMutation.mutate(formattedData);
   };
   
   const handleClose = () => {
@@ -184,7 +189,13 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
                     <FormItem className="sm:col-span-3">
                       <FormLabel>Due Date</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} min={format(new Date(), "yyyy-MM-dd")} />
+                        <Input 
+                          type="datetime-local" 
+                          {...field} 
+                          value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ''} 
+                          onChange={(e) => field.onChange(new Date(e.target.value))}
+                          min={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
