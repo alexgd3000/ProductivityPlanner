@@ -42,7 +42,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <span className="text-xl font-semibold" style={{ color: '#6d856b' }}>Smart Schedule</span>
+                <span className="text-2xl font-bold" style={{ color: '#6d856b' }}>Smart Schedule</span>
               </div>
             </div>
 

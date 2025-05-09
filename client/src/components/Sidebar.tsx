@@ -47,51 +47,17 @@ export default function Sidebar({ open, setOpen, assignments }: SidebarProps) {
       )}>
       
       <div className="flex flex-col h-full overflow-y-auto">
-        {/* Logo and Close button */}
-        <div className="flex items-center justify-between px-6 py-5">
-          <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-md bg-primary-600 flex items-center justify-center">
-              <i className="ri-timer-line text-white text-xl"></i>
-            </div>
-            <span className="text-xl font-bold text-gray-900">TaskBreak</span>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setOpen(false)}
-            className="p-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 lg:hidden"
-          >
-            <i className="ri-close-line text-xl"></i>
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOpen(false)}
+          className="p-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 lg:hidden self-end m-2"
+        >
+          <i className="ri-close-line text-xl"></i>
+        </Button>
         
         {/* Navigation removed */}
         <nav className="flex-1"></nav>
-        
-        {/* User profile */}
-        <div className="px-4 py-3 mt-auto border-t border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0">
-              <div className="h-9 w-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold">
-                JS
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                Jamie Smith
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                jamie@university.edu
-              </p>
-            </div>
-            <button 
-              className="p-1 rounded-md text-gray-400 hover:text-gray-500"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            >
-              <i className={theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line'}></i>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
