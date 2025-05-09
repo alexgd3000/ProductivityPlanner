@@ -92,10 +92,9 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
   });
   
   const onSubmit = (data: AssignmentFormValues) => {
-    // Ensure dueDate is properly formatted as an ISO string
     const formattedData = {
       ...data,
-      dueDate: new Date(data.dueDate).toISOString(),
+      dueDate: data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate),
     };
     createAssignmentMutation.mutate(formattedData);
   };
