@@ -62,6 +62,7 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
       dueDate: new Date(),
       priority: "medium",
       estimatedTime: 0,
+      timeAvailable: 120, // Default to 2 hours (120 minutes)
     },
   });
   
@@ -92,10 +93,37 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
   });
   
   const onSubmit = (data: AssignmentFormValues) => {
+    // Ensure dueDate is a valid Date object
+    let dueDate: Date;
+    try {
+      dueDate = data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate);
+      // Check if it's a valid date
+      if (isNaN(dueDate.getTime())) {
+        throw new Error("Invalid date");
+      }
+    } catch (error) {
+      toast({
+        title: "Invalid date",
+        description: "Please enter a valid due date",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Ensure numeric fields are valid numbers
+    const estimatedTime = typeof data.estimatedTime === 'number' ? 
+      data.estimatedTime : parseInt(String(data.estimatedTime), 10) || 0;
+    
+    const timeAvailable = typeof data.timeAvailable === 'number' ? 
+      data.timeAvailable : parseInt(String(data.timeAvailable), 10) || 120;
+    
     const formattedData = {
       ...data,
-      dueDate: data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate),
+      dueDate,
+      estimatedTime,
+      timeAvailable,
     };
+    
     createAssignmentMutation.mutate(formattedData);
   };
   
@@ -192,7 +220,18 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
                           type="datetime-local" 
                           {...field} 
                           value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ''} 
-                          onChange={(e) => field.onChange(new Date(e.target.value))}
+                          onChange={(e) => {
+                            try {
+                              // Make sure we create a valid Date object
+                              const date = new Date(e.target.value);
+                              // Check if it's a valid date
+                              if (!isNaN(date.getTime())) {
+                                field.onChange(date);
+                              }
+                            } catch (error) {
+                              console.error("Invalid date input", error);
+                            }
+                          }}
                           min={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
                         />
                       </FormControl>
@@ -227,6 +266,47 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
                   )}
                 />
                 
+                <FormField
+                  control={form.control}
+                  name="estimatedTime"
+                  render={({ field }) => (
+                    <FormItem className="sm:col-span-3">
+                      <FormLabel>Estimated Time (minutes)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Enter time in minutes"
+                          min={0}
+                          {...field}
+                          value={field.value || ""}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="timeAvailable"
+                  render={({ field }) => (
+                    <FormItem className="sm:col-span-3">
+                      <FormLabel>Available Time (minutes)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Enter time in minutes"
+                          min={0}
+                          {...field}
+                          value={field.value || ""}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 120)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
 
               </div>

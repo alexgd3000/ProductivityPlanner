@@ -52,8 +52,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/assignments", async (req: Request, res: Response) => {
     try {
-      // First validate the request body 
-      const result = insertAssignmentSchema.safeParse(req.body);
+      // Normalize the data before validation
+      const normalizedData = { ...req.body };
+      
+      // Ensure dueDate is a valid date
+      if (normalizedData.dueDate) {
+        try {
+          // Convert to Date object if it's a string or timestamp
+          if (typeof normalizedData.dueDate === 'string' || typeof normalizedData.dueDate === 'number') {
+            normalizedData.dueDate = new Date(normalizedData.dueDate);
+          }
+          
+          // Check if the date is valid
+          if (!(normalizedData.dueDate instanceof Date) || isNaN(normalizedData.dueDate.getTime())) {
+            return res.status(400).json({ 
+              message: "Invalid assignment data",
+              errors: { dueDate: ["Invalid date format"] }
+            });
+          }
+        } catch (err) {
+          return res.status(400).json({ 
+            message: "Invalid assignment data",
+            errors: { dueDate: ["Could not parse date"] }
+          });
+        }
+      }
+      
+      // Ensure numeric fields are valid numbers
+      ['estimatedTime', 'timeAvailable'].forEach(field => {
+        if (normalizedData[field] !== undefined) {
+          const value = parseInt(String(normalizedData[field]), 10);
+          normalizedData[field] = isNaN(value) ? 0 : value;
+        }
+      });
+      
+      // Now validate with schema
+      const result = insertAssignmentSchema.safeParse(normalizedData);
       if (!result.success) {
         return res.status(400).json({ 
           message: "Invalid assignment data",
