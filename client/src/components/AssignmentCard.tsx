@@ -268,30 +268,27 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
   
   let formattedDueDate;
   if (diffHours < 0) {
-    // Past due
-    if (diffHours > -24) {
-      // Less than 24 hours ago
-      const hours = Math.abs(Math.floor(diffHours));
-      const minutes = Math.abs(Math.floor((diffHours - Math.floor(diffHours)) * 60));
-      formattedDueDate = hours > 0 
-        ? `${hours}h ${minutes > 0 ? minutes + 'm' : ''} overdue`
-        : `${minutes}m overdue`;
-    } else {
-      formattedDueDate = formatDistanceToNow(dueDate, { addSuffix: true });
-    }
-  } else if (diffHours < 24) {
-    // Due within 24 hours
-    const hours = Math.floor(diffHours);
-    const minutes = Math.floor((diffHours - hours) * 60);
-    formattedDueDate = hours > 0 
-      ? `due in ${hours}h ${minutes > 0 ? minutes + 'm' : ''}`
-      : `due in ${minutes}m`;
-  } else if (diffHours < 7 * 24) {
-    // Due within a week
-    formattedDueDate = `due in ${Math.floor(diffHours / 24)} days`;
+    // Past due (overdue)
+    formattedDueDate = "overdue";
   } else {
-    // Due in more than a week
-    formattedDueDate = format(dueDate, 'MMM d, yyyy');
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const startOfTomorrow = new Date(startOfToday);
+    startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+    
+    if (dueDate < startOfTomorrow) {
+      formattedDueDate = "due today";
+    } else {
+      const startOfDayAfterTomorrow = new Date(startOfToday);
+      startOfDayAfterTomorrow.setDate(startOfDayAfterTomorrow.getDate() + 2);
+      
+      if (dueDate < startOfDayAfterTomorrow) {
+        formattedDueDate = "due tomorrow";
+      } else {
+        const daysDiff = Math.ceil(diffHours / 24);
+        formattedDueDate = `due in ${daysDiff} days`;
+      }
+    }
   }
 
   // Find the active task object
