@@ -260,6 +260,10 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
     onRefresh();
   };
 
+  // Calculate total time from tasks
+  const totalTimeAllocation = tasks.reduce((sum, task) => sum + task.timeAllocation, 0);
+  assignment.estimatedTime = totalTimeAllocation;
+
   // Format due date
   let formattedDueDate;
   try {
@@ -273,10 +277,8 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
       const now = new Date();
       
       // Set both dates to start of day for comparison
-      const dueDateStart = new Date(dueDate);
-      dueDateStart.setHours(0, 0, 0, 0);
-      const todayStart = new Date(now);
-      todayStart.setHours(0, 0, 0, 0);
+      const dueDateStart = new Date(dueDate.setHours(0, 0, 0, 0));
+      const todayStart = new Date(now.setHours(0, 0, 0, 0));
       const tomorrowStart = new Date(todayStart);
       tomorrowStart.setDate(tomorrowStart.getDate() + 1);
       
