@@ -33,6 +33,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Sidebar for mobile */}
+      <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} assignments={assignments} />
+
       {/* Top navigation bar */}
       <header className="bg-white border-b border-gray-200 z-10">
         <div className="px-4 sm:px-6 lg:px-8">
