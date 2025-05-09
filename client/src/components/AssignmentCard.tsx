@@ -409,7 +409,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center text-sm text-gray-500">
             <i className="ri-calendar-line mr-1"></i>
-            <span>Due {formattedDueDate}</span>
+            <span>{formattedDueDate}</span>
           </div>
           
           <div className="flex items-center text-sm text-gray-500">
