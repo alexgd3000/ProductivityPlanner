@@ -334,7 +334,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
                   <span className="ml-2 text-sm font-medium text-gray-700">{progress}%</span>
                 </div>
                 <div className="mt-1 text-xs text-gray-500">
-                  {completedTasks} of {totalTasks} tasks
+                  {completedTasks} of {totalTasks} tasks · {formatTime(totalTimeSpent)} used of {formatTime(totalTimeAllocation)}
                 </div>
               </div>
             </div>
@@ -480,8 +480,9 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">{progress}%</div>
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-900">{completedTasks} of {totalTasks} tasks</span>
+                <span className="text-sm text-gray-500">{formatTime(totalTimeSpent)} used of {formatTime(totalTimeAllocation)}</span>
               </div>
             </div>
           </div>
