@@ -46,10 +46,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </div>
 
               {/* Mobile menu button */}
-              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              >
+                <i className="ri-menu-line text-xl"></i>
+              </Button>
+            </div>
 
-            {/* Menu hidden */}
-            <nav className="hidden">
+            {/* Menu toggled by hamburger button */}
+            <nav className={`fixed top-16 left-0 right-0 bg-white border-b border-gray-200 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
               <div className="px-4 py-2 space-y-2">
                 <Link href="/profile">
                   <a className={getNavItemClass("/profile")}>
