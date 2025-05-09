@@ -335,7 +335,6 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
                 </div>
                 <div className="mt-1 text-xs text-gray-500">
                   {completedTasks} of {totalTasks} tasks
-                  <span className="sr-only"> · {formatTime(totalTimeSpent)} used of {formatTime(totalTimeAllocation)}</span>
                 </div>
               </div>
             </div>
@@ -483,7 +482,6 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
               </div>
               <div className="flex items-center">
                 <span className="text-sm text-gray-900">{completedTasks} of {totalTasks} tasks</span>
-                <span className="sr-only">{formatTime(totalTimeSpent)} used of {formatTime(totalTimeAllocation)}</span>
               </div>
             </div>
           </div>

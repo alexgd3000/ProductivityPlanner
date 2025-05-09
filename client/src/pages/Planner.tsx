@@ -58,9 +58,7 @@ export default function Planner() {
     return [...assignments].sort((a, b) => {
       switch (sortBy) {
         case "dueDate":
-          const dateA = a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate);
-          const dateB = b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate);
-          return dateA.getTime() - dateB.getTime();
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
         case "priority":
           const priorityOrder: Record<string, number> = { "high": 0, "medium": 1, "low": 2 };
           return priorityOrder[a.priority] - priorityOrder[b.priority];
