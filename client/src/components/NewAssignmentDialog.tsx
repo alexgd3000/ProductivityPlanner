@@ -93,17 +93,40 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
   });
   
   const onSubmit = (data: AssignmentFormValues) => {
-    // Set the due date to end of the selected day
-    const dueDate = new Date(data.dueDate);
-    dueDate.setHours(23, 59, 59, 999);
+    // Ensure dueDate is a valid Date object
+    let dueDate: Date;
+    try {
+      dueDate = data.dueDate instanceof Date ? data.dueDate : new Date(data.dueDate);
+      // Check if it's a valid date
+      if (isNaN(dueDate.getTime())) {
+        throw new Error("Invalid date");
+      }
+      // Set the due date to end of the selected day
+      dueDate.setHours(23, 59, 59, 999);
+    } catch (error) {
+      toast({
+        title: "Invalid date",
+        description: "Please enter a valid due date",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Ensure numeric fields are valid numbers
+    const estimatedTime = typeof data.estimatedTime === 'number' ? 
+      data.estimatedTime : parseInt(String(data.estimatedTime), 10) || 0;
+    
+    const timeAvailable = typeof data.timeAvailable === 'number' ? 
+      data.timeAvailable : parseInt(String(data.timeAvailable), 10) || 120;
     
     const formattedData = {
       ...data,
       dueDate,
-      estimatedTime: 0, // Will be calculated from tasks
-      timeAvailable: 120, // Default value
+      estimatedTime,
+      timeAvailable,
     };
     
+    console.log("Submitting assignment data:", formattedData);
     createAssignmentMutation.mutate(formattedData);
   };
   

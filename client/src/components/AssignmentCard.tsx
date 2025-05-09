@@ -261,27 +261,39 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
   };
 
   // Format due date
-  const dueDate = new Date(assignment.dueDate);
-  const now = new Date();
-  
-  // Set both dates to start of day for comparison
-  const dueDateStart = new Date(dueDate);
-  dueDateStart.setHours(0, 0, 0, 0);
-  const todayStart = new Date(now);
-  todayStart.setHours(0, 0, 0, 0);
-  const tomorrowStart = new Date(todayStart);
-  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-  
   let formattedDueDate;
-  if (dueDateStart < todayStart) {
-    formattedDueDate = "overdue";
-  } else if (dueDateStart.getTime() === todayStart.getTime()) {
-    formattedDueDate = "due today";
-  } else if (dueDateStart.getTime() === tomorrowStart.getTime()) {
-    formattedDueDate = "due tomorrow";
-  } else {
-    const diffDays = Math.ceil((dueDateStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
-    formattedDueDate = `due in ${diffDays} days`;
+  try {
+    // Make sure we have a valid date object
+    const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null;
+    
+    // Check if we have a valid date
+    if (!dueDate || isNaN(dueDate.getTime())) {
+      formattedDueDate = "no due date";
+    } else {
+      const now = new Date();
+      
+      // Set both dates to start of day for comparison
+      const dueDateStart = new Date(dueDate);
+      dueDateStart.setHours(0, 0, 0, 0);
+      const todayStart = new Date(now);
+      todayStart.setHours(0, 0, 0, 0);
+      const tomorrowStart = new Date(todayStart);
+      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+      
+      if (dueDateStart < todayStart) {
+        formattedDueDate = "overdue";
+      } else if (dueDateStart.getTime() === todayStart.getTime()) {
+        formattedDueDate = "due today";
+      } else if (dueDateStart.getTime() === tomorrowStart.getTime()) {
+        formattedDueDate = "due tomorrow";
+      } else {
+        const diffDays = Math.ceil((dueDateStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
+        formattedDueDate = `due in ${diffDays} days`;
+      }
+    }
+  } catch (error) {
+    console.error("Error formatting due date:", error);
+    formattedDueDate = "date error";
   }
 
   // Find the active task object
