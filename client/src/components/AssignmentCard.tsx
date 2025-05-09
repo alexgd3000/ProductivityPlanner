@@ -263,22 +263,31 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
   };
 
   // Format due date
-  let formattedDueDate;
-  try {
-    const dueDate = typeof assignment.dueDate === 'string' ? parseISO(assignment.dueDate) : new Date(assignment.dueDate);
+  const getFormattedDueDate = () => {
+    try {
+      const dueDate = typeof assignment.dueDate === 'string' ? parseISO(assignment.dueDate) : new Date(assignment.dueDate);
+      const now = new Date();
+      
+      // Set both dates to start of day for comparison
+      const dueDateStart = new Date(dueDate.setHours(0, 0, 0, 0));
+      const todayStart = new Date(now.setHours(0, 0, 0, 0));
 
-    // Format based on when it's due
-    if (isToday(dueDate)) {
-      formattedDueDate = "Due today";
-    } else if (isTomorrow(dueDate)) {
-      formattedDueDate = "Due tomorrow";
-    } else {
-      formattedDueDate = `Due ${format(dueDate, 'MMM d')}`;
+      const daysDiff = Math.floor((dueDateStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (daysDiff === 0) {
+        return "Due today";
+      } else if (daysDiff === 1) {
+        return "Due tomorrow";
+      } else {
+        return `Due ${format(dueDate, 'MMM d')}`;
+      }
+    } catch (error) {
+      console.error("Error formatting due date:", error);
+      return "date error";
     }
-  } catch (error) {
-    console.error("Error formatting due date:", error);
-    formattedDueDate = "date error";
-  }
+  };
+
+  const formattedDueDate = getFormattedDueDate();
 
   // Find the active task object
   const activeTask = tasks.find(task => task.id === activeTaskId);
