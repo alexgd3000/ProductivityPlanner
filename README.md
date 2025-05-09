@@ -1,4 +1,4 @@
-# TaskBreak
+# SmartSchedule
 
 A productivity web application designed to transform student assignment management through intelligent task breakdown and smart scheduling, with a focus on creating an engaging and adaptive user experience.
 
