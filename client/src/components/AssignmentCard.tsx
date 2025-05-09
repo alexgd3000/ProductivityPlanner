@@ -113,6 +113,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
   // Calculate time usage
   const totalTimeSpent = tasks.reduce((sum, task) => sum + task.timeSpent, 0);
   const totalTimeAllocation = tasks.reduce((sum, task) => sum + task.timeAllocation, 0);
+  assignment.estimatedTime = totalTimeAllocation;
   
   // Format time for display (convert minutes to hours and minutes)
   const formatTime = (minutes: number) => {
@@ -259,10 +260,6 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
     refetchTasks();
     onRefresh();
   };
-
-  // Calculate total time from tasks
-  const totalTimeAllocation = tasks.reduce((sum, task) => sum + task.timeAllocation, 0);
-  assignment.estimatedTime = totalTimeAllocation;
 
   // Format due date
   let formattedDueDate;
