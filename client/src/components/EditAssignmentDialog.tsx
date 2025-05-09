@@ -309,10 +309,7 @@ export default function EditAssignmentDialog({
                             <Calendar
                               mode="single"
                               selected={field.value}
-                              onSelect={(date) => {
-                                field.onChange(date);
-                                form.setFieldValue('dueDate', date);
-                              }}
+                              onSelect={field.onChange}
                               initialFocus
                             />
                           </PopoverContent>
