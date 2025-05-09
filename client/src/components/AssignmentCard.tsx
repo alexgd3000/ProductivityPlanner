@@ -266,9 +266,30 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
   const diffMs = dueDate.getTime() - now.getTime();
   const diffHours = diffMs / (1000 * 60 * 60);
   
-  const formattedDueDate = isToday(dueDate) 
-    ? "due today"
-    : format(dueDate, "MMM d, yyyy");
+  let formattedDueDate;
+  if (diffHours < 0) {
+    // Past due (overdue)
+    formattedDueDate = "overdue";
+  } else {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const startOfTomorrow = new Date(startOfToday);
+    startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+    
+    if (dueDate < startOfTomorrow) {
+      formattedDueDate = "due today";
+    } else {
+      const startOfDayAfterTomorrow = new Date(startOfToday);
+      startOfDayAfterTomorrow.setDate(startOfDayAfterTomorrow.getDate() + 2);
+      
+      if (dueDate < startOfDayAfterTomorrow) {
+        formattedDueDate = "due tomorrow";
+      } else {
+        const daysDiff = Math.ceil(diffHours / 24);
+        formattedDueDate = `due in ${daysDiff} days`;
+      }
+    }
+  }
 
   // Find the active task object
   const activeTask = tasks.find(task => task.id === activeTaskId);
