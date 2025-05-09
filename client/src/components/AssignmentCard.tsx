@@ -465,11 +465,11 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
       
       {/* Card Footer */}
       <CardFooter className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 mr-3">
+        <div className="flex flex-col w-full gap-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
               <div className="relative">
-                <svg className="w-10 h-10" viewBox="0 0 36 36">
+                <svg className="w-8 h-8" viewBox="0 0 36 36">
                   <circle cx="18" cy="18" r="16" fill="none" stroke="#e5e7eb" strokeWidth="2"></circle>
                   <circle 
                     cx="18" 
@@ -485,17 +485,18 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">{progress}%</div>
               </div>
-            </div>
-            <div>
-              <h4 className="text-sm font-medium text-gray-900">{completedTasks} of {totalTasks} tasks</h4>
-              <p className="text-xs text-gray-500">{formatTime(totalTimeSpent)} used of {formatTime(totalTimeAllocation)}</p>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-900">{completedTasks} of {totalTasks} tasks</span>
+                <span className="text-sm text-gray-500">{formatTime(totalTimeSpent)} used of {formatTime(totalTimeAllocation)}</span>
+              </div>
             </div>
           </div>
+          
           {assignment.completed ? (
             <Button 
               variant="outline"
               onClick={() => setShowCompleteDialog(true)}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full"
             >
               <UndoIcon className="h-4 w-4" />
               Move to Current
@@ -504,7 +505,7 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
             <Button 
               variant="default"
               onClick={() => setShowCompleteDialog(true)}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full"
             >
               <CheckCircle className="h-4 w-4" />
               Complete Assignment
