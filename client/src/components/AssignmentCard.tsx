@@ -260,35 +260,28 @@ export default function AssignmentCard({ assignment, isActive, viewMode, onRefre
     onRefresh();
   };
 
-  // Format due date with precise hours and minutes for near-term deadlines
+  // Format due date
   const dueDate = new Date(assignment.dueDate);
   const now = new Date();
-  const diffMs = dueDate.getTime() - now.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
+  
+  // Set both dates to start of day for comparison
+  const dueDateStart = new Date(dueDate);
+  dueDateStart.setHours(0, 0, 0, 0);
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
   
   let formattedDueDate;
-  if (diffHours < 0) {
-    // Past due (overdue)
+  if (dueDateStart < todayStart) {
     formattedDueDate = "overdue";
+  } else if (dueDateStart.getTime() === todayStart.getTime()) {
+    formattedDueDate = "due today";
+  } else if (dueDateStart.getTime() === tomorrowStart.getTime()) {
+    formattedDueDate = "due tomorrow";
   } else {
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-    const startOfTomorrow = new Date(startOfToday);
-    startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
-    
-    if (dueDate < startOfTomorrow) {
-      formattedDueDate = "due today";
-    } else {
-      const startOfDayAfterTomorrow = new Date(startOfToday);
-      startOfDayAfterTomorrow.setDate(startOfDayAfterTomorrow.getDate() + 2);
-      
-      if (dueDate < startOfDayAfterTomorrow) {
-        formattedDueDate = "due tomorrow";
-      } else {
-        const daysDiff = Math.ceil(diffHours / 24);
-        formattedDueDate = `due in ${daysDiff} days`;
-      }
-    }
+    const diffDays = Math.ceil((dueDateStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
+    formattedDueDate = `due in ${diffDays} days`;
   }
 
   // Find the active task object
