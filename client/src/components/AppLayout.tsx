@@ -56,35 +56,37 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </Button>
             </div>
 
-            {/* Main navigation for desktop */}
-            <nav className="hidden md:flex space-x-1 ml-8">
-              <Link href="/profile">
-                <a className={getNavItemClass("/profile")}>
-                  <UserCircle className="mr-2 h-5 w-5" />
-                  Profile
-                </a>
-              </Link>
+            {/* Menu toggled by hamburger button */}
+            <nav className={`${sidebarOpen ? 'block' : 'hidden'} absolute top-16 left-0 right-0 bg-white border-b border-gray-200 md:static md:border-0`}>
+              <div className="px-4 py-2 space-y-2">
+                <Link href="/profile">
+                  <a className={getNavItemClass("/profile")}>
+                    <UserCircle className="mr-2 h-5 w-5" />
+                    Profile
+                  </a>
+                </Link>
 
-              <Link href="/upload">
-                <a className={getNavItemClass("/upload")}>
-                  <Upload className="mr-2 h-5 w-5" />
-                  Upload
-                </a>
-              </Link>
+                <Link href="/upload">
+                  <a className={getNavItemClass("/upload")}>
+                    <Upload className="mr-2 h-5 w-5" />
+                    Upload
+                  </a>
+                </Link>
 
-              <Link href="/planner">
-                <a className={getNavItemClass("/planner")}>
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Planner
-                </a>
-              </Link>
+                <Link href="/planner">
+                  <a className={getNavItemClass("/planner")}>
+                    <Calendar className="mr-2 h-5 w-5" />
+                    Planner
+                  </a>
+                </Link>
 
-              <Link href="/focus">
-                <a className={getNavItemClass("/focus")}>
-                  <Clock className="mr-2 h-5 w-5" />
-                  Focus
-                </a>
-              </Link>
+                <Link href="/focus">
+                  <a className={getNavItemClass("/focus")}>
+                    <Clock className="mr-2 h-5 w-5" />
+                    Focus
+                  </a>
+                </Link>
+              </div>
             </nav>
 
             {/* Right-side actions */}
