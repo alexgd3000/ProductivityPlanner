@@ -69,8 +69,16 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
   // Mutation for creating a new assignment
   const createAssignmentMutation = useMutation({
     mutationFn: async (data: AssignmentFormValues) => {
-      const response = await apiRequest("POST", "/api/assignments", data);
-      return response.json();
+      console.log("Mutation executing with data:", data);
+      try {
+        const response = await apiRequest("POST", "/api/assignments", data);
+        const result = await response.json();
+        console.log("Mutation successful, response:", result);
+        return result;
+      } catch (error) {
+        console.error("Mutation error:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       setCreatedAssignmentId(data.id);
@@ -164,7 +172,11 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
         
         {!showTaskForm ? (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              console.log("Form submitted");
+              form.handleSubmit(onSubmit)(e);
+            }} className="space-y-6">
               <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <FormField
                   control={form.control}
@@ -271,7 +283,14 @@ export default function NewAssignmentDialog({ open, onOpenChange, onAssignmentCr
                 <Button type="button" variant="outline" onClick={handleClose}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createAssignmentMutation.isPending}>
+                <Button 
+                  type="button" 
+                  disabled={createAssignmentMutation.isPending}
+                  onClick={() => {
+                    console.log("Create button clicked");
+                    form.handleSubmit(onSubmit)();
+                  }}
+                >
                   {createAssignmentMutation.isPending ? "Creating..." : "Create Assignment"}
                 </Button>
               </DialogFooter>
